@@ -1,14 +1,21 @@
 package com.example.gregor.movielist;
 
 import android.content.Context;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.gregor.movielist.R;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -22,6 +29,8 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
     MovieListAdapter(Context context, List<Film> data) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
+        loader.init(ImageLoaderConfiguration.createDefault(context));
+
     }
 
     // inflates the row layout from xml when needed
@@ -30,14 +39,18 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
         View view = mInflater.inflate(R.layout.movie_list_row, parent, false);
         return new ViewHolder(view);
     }
-
+    private ImageLoader loader=ImageLoader.getInstance();
     // binds the data to the TextView in each row
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+
         Film film = mData.get(position);
         holder.nameText.setText(film.getNaslov());
-        holder.yearText.setText(film.getLeto());
+        holder.yearText.setText(Integer.toString(film.getLeto()));
         holder.ratingText.setText(String.valueOf(film.getRating()));
+
+        //Picasso.get().load(film.getImglink().replace("https","http")).fit().error(R.drawable.ic_launcher_foreground).placeholder(R.drawable.ic_launcher_background).into(holder.movieimg);
+        loader.displayImage(film.getImglink().substring(0,film.getImglink().indexOf("_V1_")+4)+".jpg", holder.movieimg,new DisplayImageOptions.Builder().imageScaleType(ImageScaleType.EXACTLY).build());
     }
 
     // total number of rows
@@ -50,13 +63,14 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView nameText, ratingText, yearText;
-
+        ImageView movieimg;
         ViewHolder(View itemView) {
             super(itemView);
             nameText = itemView.findViewById(R.id.movieName);
             ratingText = itemView.findViewById(R.id.movieRating);
             yearText = itemView.findViewById(R.id.movieYear);
-            itemView.setOnClickListener(this);
+            movieimg = itemView.findViewById(R.id.movieImage);
+           // itemView.setOnClickListener(this);
         }
 
         @Override
