@@ -1,6 +1,5 @@
 package com.example.gregor.movielist;
 
-import android.graphics.Movie;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;

@@ -1,6 +1,9 @@
 package com.example.gregor.movielist;
 
-public class Film {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Film implements Parcelable{
     private String naslov;
     private int leto;
     private double rating;
@@ -14,6 +17,8 @@ public class Film {
         this.id = id;
         this.imglink = imglink;
     }
+
+
 
     public String getNaslov() {
         return naslov;
@@ -53,5 +58,36 @@ public class Film {
 
     public void setImglink(String imglink) {
         this.imglink = imglink;
+    }
+
+    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+        public Film createFromParcel(Parcel in) {
+            return new Film(in);
+        }
+
+        public Film[] newArray(int size) {
+            return new Film[size];
+        }
+    };
+    public Film(Parcel in) {
+        this.naslov=in.readString();
+        this.id=in.readString();
+        this.imglink=in.readString();
+        this.rating=in.readDouble();
+        this.leto=in.readInt();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.naslov);
+        dest.writeString(this.id);
+        dest.writeString(this.imglink);
+        dest.writeDouble(this.rating);
+        dest.writeInt(this.leto);
     }
 }

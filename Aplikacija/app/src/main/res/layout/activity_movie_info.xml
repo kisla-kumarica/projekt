@@ -16,6 +16,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="Movie Name"
+        android:textColor="@color/Foreground_light"
         android:textSize="40sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -32,6 +33,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="year"
+        android:textColor="@color/Foreground_light"
         android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="@+id/MovieNameView"
         app:layout_constraintEnd_toEndOf="parent"
@@ -40,13 +42,16 @@
 
     <TextView
         android:id="@+id/moviePlotView"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="PLOTPLOTPLOTPLOTPLOTPLOTPLOTPLOTPLOTPLOTPLOTPLOTPLOTPLOTPLOTPLOTPLOTPLOTPLOTPLOTPLOTPLOTPLOTPLOTPLOTPLOTPLOTPLOTPLOTPLOT"
+        android:textColor="@color/Foreground_light"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/imageView2"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/MovieNameView" />
 
@@ -60,6 +65,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="Director"
+        android:textColor="@color/Foreground_light"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/moviePlotView" />
@@ -74,6 +80,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="ACTORSACTORSACTORSACTORS"
+        android:textColor="@color/Foreground_light"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView4" />
@@ -82,11 +89,12 @@
         android:id="@+id/textView6"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="7dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
+        android:layout_marginRight="7dp"
         android:layout_marginStart="8dp"
         android:text="Actors:"
+        android:textColor="@color/Foreground_light"
         android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@+id/textView5"
         app:layout_constraintStart_toStartOf="parent"
@@ -101,6 +109,7 @@
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
         android:text="Director:"
+        android:textColor="@color/Foreground_light"
         android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@+id/textView4"
         app:layout_constraintStart_toStartOf="parent"
@@ -120,11 +129,28 @@
         app:srcCompat="@drawable/ic_baseline_star_rate_18px" />
 
     <TextView
-        android:id="@+id/textView8"
+        android:id="@+id/movieRatingView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="15dp"
         android:text="Rating"
+        android:textColor="@color/Foreground_light"
+        app:layout_constraintBottom_toBottomOf="@+id/imageView"
         app:layout_constraintStart_toEndOf="@+id/imageView"
         app:layout_constraintTop_toBottomOf="@+id/movieYearView" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintEnd_toStartOf="@+id/moviePlotView"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/moviePlotView"
+        app:srcCompat="@mipmap/ic_launcher" />
 </android.support.constraint.ConstraintLayout>
