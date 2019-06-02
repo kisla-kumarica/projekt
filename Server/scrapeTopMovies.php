@@ -4,6 +4,8 @@ class Film
 	public $naslov;
 	public $rating;
 	public $leto;
+	public $id;
+	public $imglink;
 }
 $html=file_get_contents("https://www.imdb.com/chart/top?ref_=nv_mv_250");
 $dom = new DOMDocument();
@@ -17,6 +19,13 @@ $ind = 0;
 foreach($naslovi as $value) {
 	$filmi[$ind]=new Film();
     	$filmi[$ind]->naslov = ($value->textContent);
+    	$filmi[$ind]->id = (explode("/",$value->getAttribute("href"))[2]);
+	$ind++;
+}
+$ind = 0;
+$links= $xpath->query('//td[@class="posterColumn"]/a/img');
+foreach($links as $value) {
+    	$filmi[$ind]->imglink= ($value->getAttribute("src"));
 	$ind++;
 }
 $ind = 0;
