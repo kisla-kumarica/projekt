@@ -73,5 +73,14 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/movieYear"
             app:layout_constraintTop_toBottomOf="@+id/movieImage" />
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@+id/movieRating"
+            app:layout_constraintEnd_toStartOf="@+id/movieRating"
+            android:tint="#fff600"
+            app:srcCompat="@drawable/ic_baseline_star_rate_18px" />
     </android.support.constraint.ConstraintLayout>
 </LinearLayout>

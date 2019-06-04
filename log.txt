@@ -1,0 +1,47 @@
+commit fb89b692bacad208c3876338e0d106d4120f4878
+Author: Unknown <gregor.rant123@gmail.com>
+Date:   Sun Jun 2 23:47:24 2019 +0200
+
+    Done movie info functionality
+    
+    Movie Info Activity now has basic functionality.
+
+commit 6d87a6bee7c6dd8b12ea45fbb873f4cc4d1331e0
+Author: Unknown <gregor.rant123@gmail.com>
+Date:   Sun Jun 2 22:23:49 2019 +0200
+
+    Added Movie Description Activity
+    
+    TODO: functionality
+
+commit e6687a361da78af9b39b9761637b89588fb9d22a
+Author: Unknown <gregor.rant123@gmail.com>
+Date:   Sun Jun 2 20:11:45 2019 +0200
+
+    Added application files with basic functionality
+    
+    Funkcionalnost: izpis najbolje ocenjenih IMDB filmov.
+
+commit b3a6021851d2f8e0c2881f3cd2579c99af41e738
+Author: Gregor <gregor.rant123@gmail.com>
+Date:   Sun Jun 2 12:04:46 2019 +0200
+
+    Added movie ID and thumbnail scraping
+
+commit d4ee4c58791b188a0573a0b18ea0bc936c790836
+Author: Gregor <gregor.rant123@gmail.com>
+Date:   Sun Jun 2 11:13:19 2019 +0200
+
+    Added top movies scraping functonality
+
+commit 951361d017b3dabf49502934bc33a3e7ffef4b14
+Author: Unknown <gregor.rant123@gmail.com>
+Date:   Sat Jun 1 20:39:10 2019 +0200
+
+    Added basic server files and gitignore
+
+commit 437d5c0b51be8a48f73e650b7b34315d50abed76
+Author: Unknown <gregor.rant123@gmail.com>
+Date:   Fri May 31 11:44:00 2019 +0200
+
+    Initial commit
