@@ -94,5 +94,20 @@
             android:text="Add list"
             app:layout_constraintStart_toEndOf="@+id/listidEditText"
             app:layout_constraintTop_toBottomOf="@+id/button3" />
+
+        <Button
+            android:id="@+id/button5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:onClick="addImageOnClick"
+            android:text="add with image"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/listidEditText" />
     </android.support.constraint.ConstraintLayout>
 </FrameLayout>

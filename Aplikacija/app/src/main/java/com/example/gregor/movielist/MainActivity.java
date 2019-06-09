@@ -1,16 +1,22 @@
 package com.example.gregor.movielist;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -42,6 +48,8 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 
+import org.opencv.android.OpenCVLoader;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +74,9 @@ public class MainActivity extends BaseActivity implements AddFrag.OnFragmentInte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         instance=this;
-
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_DENIED)
+            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.CAMERA}, 1);
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -108,7 +118,6 @@ public class MainActivity extends BaseActivity implements AddFrag.OnFragmentInte
                         // Insert the fragment by replacing any existing fragment
                         FragmentManager fragmentManager = getSupportFragmentManager();
                         fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
-
                         // Highlight the selected item has been done by NavigationView
                         menuItem.setChecked(true);
                         // Set action bar title
@@ -119,16 +128,10 @@ public class MainActivity extends BaseActivity implements AddFrag.OnFragmentInte
                         return true;
                     }
                 });
-
+        HomeFrag frag=new HomeFrag();
         FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction().add(R.id.flContent, (Fragment)frag).commit();
 
-        try {
-            fragmentManager.beginTransaction().replace(R.id.flContent, HomeFrag.class.newInstance()).commit();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        }
 
     }
     private ActionBarDrawerToggle setupDrawerToggle() {
@@ -154,6 +157,23 @@ public class MainActivity extends BaseActivity implements AddFrag.OnFragmentInte
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         settings.edit().clear().commit();
+    }
+    public void addImageOnClick(View v)
+    {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, 1);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            //imageView.setImageBitmap(imageBitmap);
+
+        }
     }
     public void listonCLick(View v)
     {
