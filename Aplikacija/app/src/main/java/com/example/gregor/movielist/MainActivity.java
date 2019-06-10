@@ -8,8 +8,10 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.speech.tts.TextToSpeechService;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -43,16 +45,20 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.googlecode.tesseract.android.TessBaseAPI;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 
 import org.opencv.android.OpenCVLoader;
+import org.opencv.core.Mat;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+
 
 public class MainActivity extends BaseActivity implements AddFrag.OnFragmentInteractionListener, HomeFrag.OnFragmentInteractionListener, SettingsFrag.OnFragmentInteractionListener{
 
@@ -77,6 +83,24 @@ public class MainActivity extends BaseActivity implements AddFrag.OnFragmentInte
         if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_DENIED)
             ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.CAMERA}, 1);
+
+
+
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            } else {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        1);
+            }
+        }
+
+
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -162,17 +186,24 @@ public class MainActivity extends BaseActivity implements AddFrag.OnFragmentInte
     {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(takePictureIntent, 1);
+            startActivityForResult(takePictureIntent, 1024);
         }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 1 && resultCode == RESULT_OK) {
+        if (requestCode == 1024 && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
             //imageView.setImageBitmap(imageBitmap);
+            TessBaseAPI tess = new TessBaseAPI();
 
+            tess.init(Environment.getExternalStorageDirectory().toString(), "eng");
+            tess.setPageSegMode(TessBaseAPI.PageSegMode.PSM_SINGLE_LINE);
+            tess.setImage(imageBitmap);
+            String recognizedText = tess.getUTF8Text();
+            tess.end();
+            Toast.makeText(getApplicationContext(),recognizedText,Toast.LENGTH_LONG).show();
         }
     }
     public void listonCLick(View v)
