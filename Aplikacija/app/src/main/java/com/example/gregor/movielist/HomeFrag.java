@@ -50,12 +50,8 @@ public class HomeFrag extends android.support.v4.app.Fragment {
      * @return A new instance of fragment HomeFrag.
      */
     // TODO: Rename and change types and number of parameters
-    public static HomeFrag newInstance(String param1, String param2) {
+    public static HomeFrag newInstance() {
         HomeFrag fragment = new HomeFrag();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
         return fragment;
     }
 
@@ -75,7 +71,7 @@ public class HomeFrag extends android.support.v4.app.Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-View view=inflater.inflate(R.layout.fragment_home, container, false);
+        View view=inflater.inflate(R.layout.fragment_home, container, false);
         MyApplication app = (MyApplication) getActivity().getApplication();
         RecyclerView movieList= view.findViewById(R.id.MainMovieList);
         app.sort();

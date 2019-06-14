@@ -1,4 +1,8 @@
 <?php
+function get_http_response_code($url) {
+    $headers = get_headers($url);
+    return substr($headers[0], 9, 3);
+}
 class Film
 {
 	public $naslov;
@@ -7,6 +11,10 @@ class Film
 	public $id;
 	public $imglink;
 }
+if(get_http_response_code("https://www.imdb.com/list/" . $_GET["id"])==404)
+	echo "404";
+else
+{
 $html=file_get_contents("https://www.imdb.com/list/" . $_GET["id"]);
 $dom = new DOMDocument();
 libxml_use_internal_errors(true);
@@ -42,4 +50,5 @@ foreach($leto as $value) {
 }
 
 echo json_encode($filmi);
+}
 ?>

@@ -41,7 +41,7 @@ public class BaseActivity extends AppCompatActivity {
         String pref=prefs.getString("filmi", "");
         if(pref!="") {
             @SuppressWarnings("unchecked")
-            List<Film> filmi=((List<Film>)new Gson().fromJson(pref,  new TypeToken<List<Film>>(){}.getType()));
+            List<Film> filmi= new Gson().fromJson(pref,  new TypeToken<List<Film>>(){}.getType());
             app.setFilmi(filmi);
             app.sort();
         }

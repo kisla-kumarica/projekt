@@ -1,3 +1,28 @@
+commit e6fe014c3a1b8c4ac7f362fea62bb55aa81ce1da
+Author: Gregor Rnat <gregor.rant123@gmail.com>
+Date:   Mon Jun 10 17:04:47 2019 +0200
+
+    Added tesseract library
+    
+    Added tesseract library for OCR and set up camera delegating
+
+commit 7d2dc02e31e91c2a86f2924b9c742ae67bccec00
+Author: Unknown <gregor.rant123@gmail.com>
+Date:   Sun Jun 9 18:21:08 2019 +0200
+
+    Added OpenCV
+    
+    Added OpenCV
+
+commit 91818b58a79e45525bb55a53ec5de0b09b9bbb0e
+Author: Unknown <gregor.rant123@gmail.com>
+Date:   Tue Jun 4 18:11:36 2019 +0200
+
+    Added various functionalities
+    
+    Server: added list scraping
+    App: added navigation drawer, app now using fragments. Added home and add fragments. App now can add movies from top movies list, custom lists, movie by id and title.
+
 commit fb89b692bacad208c3876338e0d106d4120f4878
 Author: Unknown <gregor.rant123@gmail.com>
 Date:   Sun Jun 2 23:47:24 2019 +0200

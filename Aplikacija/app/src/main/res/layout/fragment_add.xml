@@ -14,13 +14,14 @@
             android:id="@+id/btnTopMovies"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
             android:onClick="ToponClick"
             android:text="Add Top Movies"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/button5" />
 
         <Button
             android:id="@+id/button2"
@@ -37,14 +38,13 @@
             android:id="@+id/idEditText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:ems="10"
             android:hint="ID"
             android:inputType="textPersonName"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btnTopMovies" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <EditText
             android:id="@+id/titleEditText"

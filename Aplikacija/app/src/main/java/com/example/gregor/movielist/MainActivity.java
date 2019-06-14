@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -19,6 +20,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -52,21 +54,24 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 
 import org.opencv.android.OpenCVLoader;
+import org.opencv.android.Utils;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class MainActivity extends BaseActivity implements AddFrag.OnFragmentInteractionListener, HomeFrag.OnFragmentInteractionListener, SettingsFrag.OnFragmentInteractionListener{
-
-        static MainActivity instance;
-
-    public static MainActivity getInstance() {
-        return instance;
-    }
 
 
     private DrawerLayout mDrawer;
@@ -79,27 +84,22 @@ public class MainActivity extends BaseActivity implements AddFrag.OnFragmentInte
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        instance=this;
+
+
+
         if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_DENIED)
             ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.CAMERA}, 1);
 
 
 
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this,Manifest.permission.WRITE_EXTERNAL_STORAGE)== PackageManager.PERMISSION_DENIED)
+            if (!ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE))
+                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},2);
 
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            } else {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        1);
-            }
-        }
 
+        OpenCVLoader.initDebug();
 
 
         toolbar = findViewById(R.id.toolbar);
@@ -108,7 +108,6 @@ public class MainActivity extends BaseActivity implements AddFrag.OnFragmentInte
         // Find our drawer view
         mDrawer = findViewById(R.id.drawer);
         drawerToggle = setupDrawerToggle();
-
         // Tie DrawerLayout events to the ActionBarToggle
         mDrawer.addDrawerListener(drawerToggle);
 
@@ -139,24 +138,26 @@ public class MainActivity extends BaseActivity implements AddFrag.OnFragmentInte
                             e.printStackTrace();
                         }
 
-                        // Insert the fragment by replacing any existing fragment
                         FragmentManager fragmentManager = getSupportFragmentManager();
                         fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
-                        // Highlight the selected item has been done by NavigationView
                         menuItem.setChecked(true);
-                        // Set action bar title
                         setTitle(menuItem.getTitle());
-                        // Close the navigation drawer
                         mDrawer.closeDrawers();
 
                         return true;
                     }
                 });
-        HomeFrag frag=new HomeFrag();
+
+    }
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
+
+        //nvDrawer.getMenu().getItem(0).
+        HomeFrag frag = new HomeFrag();
         FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction().add(R.id.flContent, (Fragment)frag).commit();
-
-
+        fragmentManager.beginTransaction().replace(R.id.flContent, HomeFrag.newInstance()).commit();
     }
     private ActionBarDrawerToggle setupDrawerToggle() {
         // NOTE: Make sure you pass in a valid toolbar reference.  ActionBarDrawToggle() does not require it
@@ -180,12 +181,34 @@ public class MainActivity extends BaseActivity implements AddFrag.OnFragmentInte
     {
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        settings.edit().clear().commit();
+        settings.edit().clear().apply();
+        MyApplication app = (MyApplication)getApplication();
+        app.setFilmi(new ArrayList<Film>());
+        Toast.makeText(getApplicationContext(), "Data cleared!", Toast.LENGTH_LONG).show();
     }
+    File image;
     public void addImageOnClick(View v)
     {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            File photoFile = null;
+            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+            String imageFileName = "JPEG_" + timeStamp + "_";
+            image = null;
+            try {
+                image = File.createTempFile( imageFileName, ".jpg", getExternalFilesDir(Environment.DIRECTORY_PICTURES) );
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            // Save a file: path for use with ACTION_VIEW intents
+            String path = image.getAbsolutePath();
+            photoFile=image;
+            if(photoFile!=null)
+            {
+                Uri photoURI = FileProvider.getUriForFile(this,"com.example.android.fileprovider",photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+            }
             startActivityForResult(takePictureIntent, 1024);
         }
     }
@@ -193,37 +216,65 @@ public class MainActivity extends BaseActivity implements AddFrag.OnFragmentInte
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 1024 && resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
-            //imageView.setImageBitmap(imageBitmap);
+            Bitmap imageBitmap=BitmapFactory.decodeFile(image.getAbsolutePath());
+            //Bitmap imageBitmap = (Bitmap) extras.get("data");
+            Mat src= new Mat(imageBitmap.getWidth(),imageBitmap.getHeight(),CvType.CV_8U);
+            Utils.bitmapToMat(imageBitmap,src);
+            Imgproc.cvtColor(src,src,Imgproc.COLOR_RGB2GRAY);
+
+            Imgproc.threshold(src,src,0,255,Imgproc.THRESH_BINARY|Imgproc.THRESH_OTSU);
+            Imgproc.blur(src,src,new Size(5,5));
+            Utils.matToBitmap(src,imageBitmap);
+            src.release();
             TessBaseAPI tess = new TessBaseAPI();
 
             tess.init(Environment.getExternalStorageDirectory().toString(), "eng");
-            tess.setPageSegMode(TessBaseAPI.PageSegMode.PSM_SINGLE_LINE);
+            tess.setPageSegMode(TessBaseAPI.PageSegMode.PSM_AUTO);
             tess.setImage(imageBitmap);
             String recognizedText = tess.getUTF8Text();
+            Pattern pat = Pattern.compile("\\d{9}");
+            Matcher match=pat.matcher(recognizedText);
+            if(match.find()) {
+                String text="ls"+recognizedText.substring(match.start(),match.start()+9);
+
+                Toast.makeText(this, "Najden list ID:" + text, Toast.LENGTH_LONG).show();
+                addList(text);
+            }
+           else
+            {
+                pat = Pattern.compile("\\d{7}");
+                match=pat.matcher(recognizedText);
+                if(match.find()) {
+                    String text="tt"+recognizedText.substring(match.start(),match.start()+7);
+                    Log.d("OCR", "Najden film ID:" + text);
+                    addMovie(text);
+                }
+                else
+                    Toast.makeText(this, "Nic najdeno", Toast.LENGTH_LONG).show();
+            }
             tess.end();
-            Toast.makeText(getApplicationContext(),recognizedText,Toast.LENGTH_LONG).show();
         }
     }
-    public void listonCLick(View v)
+    public void addList(String id)
     {
-        EditText idText= findViewById(R.id.listidEditText);
-        String id=idText.getText().toString();
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         StringRequest request = new StringRequest(Request.Method.GET, "http://10.0.2.2/scrapeList.php?id="+id,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        MyApplication app = (MyApplication)getApplication();
-                        @SuppressWarnings("unchecked")
-                        List<Film> filmi=((List<Film>)new Gson().fromJson(response,  new TypeToken<List<Film>>(){}.getType()));
-                        for (Film f :filmi
-                             ) {
-                            if(!app.contains(f))
-                            app.add(f);
+                        if(!response.equals("404")) {
+                            MyApplication app = (MyApplication) getApplication();
+                            @SuppressWarnings("unchecked")
+                            List<Film> filmi = new Gson().fromJson(response, new TypeToken<List<Film>>() {
+                            }.getType());
+                            for (Film f : filmi) {
+                                if (!app.contains(f))
+                                    app.add(f);
+                            }
+                            Toast.makeText(getApplicationContext(), "List added!", Toast.LENGTH_LONG).show();
                         }
-                        Toast.makeText(getApplicationContext(),"List added!", Toast.LENGTH_LONG).show();
+                        else
+                            Toast.makeText(getApplicationContext(), "List not found!", Toast.LENGTH_LONG).show();
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -236,6 +287,13 @@ public class MainActivity extends BaseActivity implements AddFrag.OnFragmentInte
         request.setRetryPolicy(policy);
         queue.add(request);
     }
+    public void listonCLick(View v)
+    {
+        final EditText idText= findViewById(R.id.listidEditText);
+        String id=idText.getText().toString();
+addList(id);
+        idText.setText("");
+    }
 
     public void ToponClick(View v)
     {
@@ -246,7 +304,7 @@ public class MainActivity extends BaseActivity implements AddFrag.OnFragmentInte
                     public void onResponse(String response) {
                         MyApplication app = (MyApplication)getApplication();
                         @SuppressWarnings("unchecked")
-                        List<Film> filmi=((List<Film>)new Gson().fromJson(response,  new TypeToken<List<Film>>(){}.getType()));
+                        List<Film> filmi= new Gson().fromJson(response,  new TypeToken<List<Film>>(){}.getType());
                         app.setFilmi(filmi);
                         Toast.makeText(getApplicationContext(),"Top movies added!", Toast.LENGTH_LONG).show();
                     }
@@ -261,25 +319,29 @@ public class MainActivity extends BaseActivity implements AddFrag.OnFragmentInte
         request.setRetryPolicy(policy);
         queue.add(request);
     }
-    public void addIDOnClick(View v)
+    public void addMovie(String id)
     {
-        EditText idText= findViewById(R.id.idEditText);
         RequestQueue queue = Volley.newRequestQueue(this);
-        StringRequest request = new StringRequest(Request.Method.GET, "http://www.omdbapi.com/?apikey=1c2dbf9f&i="+idText.getText().toString(),
+        StringRequest request = new StringRequest(Request.Method.GET, "http://www.omdbapi.com/?apikey=1c2dbf9f&i="+id,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
 
 
                         Map info = new Gson().fromJson(response, Map.class);
-                        Film film= new Film((String)info.get("Title"),Integer.parseInt((String)info.get("Year")),Double.parseDouble((String)info.get("imdbRating")),(String)info.get("imdbID"),(String)info.get("Poster"));
-                        MyApplication app = (MyApplication)getApplication();
-                        if(app.contains(film))
-                            Toast.makeText(getApplicationContext(),"Movie "+(String)info.get("Title")+" already added!", Toast.LENGTH_LONG).show();
-                        else {
-                            app.add(film);
-                            Toast.makeText(getApplicationContext(), "Movie " + (String) info.get("Title") + " added!", Toast.LENGTH_LONG).show();
+                        if(info.size()!=2)
+                        {
+                            Film film= new Film((String)info.get("Title"),Integer.parseInt((String)info.get("Year")),Double.parseDouble((String)info.get("imdbRating")),(String)info.get("imdbID"),(String)info.get("Poster"));
+                            MyApplication app = (MyApplication)getApplication();
+                            if(app.contains(film))
+                                Toast.makeText(getApplicationContext(),"Movie "+ info.get("Title") +" already added!", Toast.LENGTH_LONG).show();
+                            else {
+                                app.add(film);
+                                Toast.makeText(getApplicationContext(), "Movie " + info.get("Title") + " added!", Toast.LENGTH_LONG).show();
+                            }
                         }
+                        else
+                            Toast.makeText(getApplicationContext(), "Movie not found!!", Toast.LENGTH_LONG).show();
 
                     }
                 }, new Response.ErrorListener() {
@@ -294,10 +356,16 @@ public class MainActivity extends BaseActivity implements AddFrag.OnFragmentInte
 
         queue.add(request);
     }
+    public void addIDOnClick(View v)
+    {
+        final EditText idText= findViewById(R.id.idEditText);
+        addMovie(idText.getText().toString());
+        idText.setText("");
+    }
 
     public void addTitleOnClick(View v)
     {
-        EditText idText= findViewById(R.id.titleEditText);
+        final EditText idText= findViewById(R.id.titleEditText);
         RequestQueue queue = Volley.newRequestQueue(this);
         StringRequest request = new StringRequest(Request.Method.GET, "http://www.omdbapi.com/?apikey=1c2dbf9f&t="+idText.getText().toString(),
                 new Response.Listener<String>() {
@@ -306,14 +374,21 @@ public class MainActivity extends BaseActivity implements AddFrag.OnFragmentInte
 
 
                         Map info = new Gson().fromJson(response, Map.class);
-                        Film film= new Film((String)info.get("Title"),Integer.parseInt((String)info.get("Year")),Double.parseDouble((String)info.get("imdbRating")),(String)info.get("imdbID"),(String)info.get("Poster"));
-                        MyApplication app = (MyApplication)getApplication();
-                        if(app.contains(film))
-                            Toast.makeText(getApplicationContext(),"Movie "+(String)info.get("Title")+" already added!", Toast.LENGTH_LONG).show();
-                        else {
-                            app.add(film);
-                            Toast.makeText(getApplicationContext(), "Movie " + (String) info.get("Title") + " added!", Toast.LENGTH_LONG).show();
+                        if(info.size()!=2) {
+                            Film film = new Film((String) info.get("Title"), Integer.parseInt((String) info.get("Year")), Double.parseDouble((String) info.get("imdbRating")), (String) info.get("imdbID"), (String) info.get("Poster"));
+                            MyApplication app = (MyApplication) getApplication();
+                            if (app.contains(film))
+                                Toast.makeText(getApplicationContext(), "Movie " + info.get("Title") + " already added!", Toast.LENGTH_LONG).show();
+                            else {
+                                app.add(film);
+                                Toast.makeText(getApplicationContext(), "Movie " + info.get("Title") + " added!", Toast.LENGTH_LONG).show();
+                            }
                         }
+                        else
+                            Toast.makeText(getApplicationContext(), "Movie not found!!", Toast.LENGTH_LONG).show();
+
+                        idText.setText("");
+
 
                     }
                 }, new Response.ErrorListener() {

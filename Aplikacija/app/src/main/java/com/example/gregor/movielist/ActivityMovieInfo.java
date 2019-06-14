@@ -40,7 +40,7 @@ public class ActivityMovieInfo extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_info);
         Bundle data = getIntent().getExtras();
-        Film film = (Film) data.getParcelable("film");
+        Film film = data.getParcelable("film");
 
 
         RequestQueue queue = Volley.newRequestQueue(this);
